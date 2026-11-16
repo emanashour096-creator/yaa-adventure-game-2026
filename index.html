@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مغامرة حرف الياء</title>
+<style>
+:root{--pink:#ff7eb6;--purple:#8b6cff;--yellow:#ffd85e;--ink:#35405c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#fff2f8,#eef6ff);color:var(--ink);min-height:100vh;padding:18px}
+.wrap{max-width:720px;margin:0 auto}
+header,.panel{background:#fff;border-radius:24px;padding:22px;box-shadow:0 8px 24px #65749b20;margin:14px 0}
+header{text-align:center;border:3px solid #ffe0ef}
+h1{color:#8b59dc;margin:6px 0 10px;font-size:clamp(27px,6vw,40px)}
+.sub{font-size:18px;color:#68738b}
+.stars{font-size:28px;letter-spacing:5px}
+label{display:block;font-weight:bold;margin:12px 0 7px}
+input{width:100%;padding:14px;border:2px solid #d9d7ff;border-radius:14px;font-size:18px}
+button{border:0;border-radius:16px;padding:13px 20px;font-size:18px;font-weight:bold;cursor:pointer;background:var(--purple);color:white;margin:6px}
+button:disabled{opacity:.5;cursor:not-allowed}
+.primary{background:linear-gradient(90deg,#8b6cff,#ff7eb6)}
+.choice{display:block;width:100%;background:#f4f1ff;color:#41405f;border:2px solid #e4ddff;text-align:right;margin:10px 0}
+.choice.selected{border-color:#8b6cff;background:#eee8ff}
+.choice.correct{background:#e2faeb;border-color:#5bc58a}
+.choice.wrong{background:#fff0f0;border-color:#f18b91}
+.topline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-weight:bold;color:#7458c8}
+.progress{height:12px;background:#eee;border-radius:20px;overflow:hidden;margin:12px 0}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#7ed9b0,#8b6cff);transition:width .3s}
+.question{font-size:24px;font-weight:bold;line-height:1.6;margin:18px 0}
+.emoji{font-size:56px;text-align:center;margin:8px}
+.hidden{display:none}
+.certificate{text-align:center;border:7px double #f5c64b;background:#fffdf5}
+.certificate h2{color:#9a65d7;font-size:30px}
+.score{font-size:28px;color:#24996c;font-weight:bold}
+.small{font-size:14px;color:#778}
+footer{text-align:center;color:#8790a5;padding:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="stars">⭐ 🌈 ⭐</div>
+ <h1>مغامرة حرف الياء</h1>
+ <div class="sub">هيا نلعب ونتعلم مع حرف الياء!</div>
+</header>
+<section class="panel" id="start">
+ <div class="emoji">🧒📚</div>
+ <h2>أهلًا يا بطل!</h2>
+ <label for="child">اكتب اسمك قبل أن نبدأ:</label>
+ <input id="child" maxlength="30" placeholder="اسم الطفل">
+ <div style="text-align:center;margin-top:14px"><button class="primary" onclick="startGame()">ابدأ المغامرة 🚀</button></div>
+</section>
+<section class="panel hidden" id="game">
+ <div class="topline"><span id="counter">السؤال 1 من 6</span><span id="score">⭐ 0</span></div>
+ <div class="progress"><div class="bar" id="bar"></div></div>
+ <div class="emoji" id="picture">🌟</div>
+ <div class="question" id="question"></div>
+ <div id="answers"></div>
+ <div style="text-align:center"><button id="next" class="primary" onclick="nextQuestion()" disabled>السؤال التالي ←</button></div>
+ <div id="feedback" style="text-align:center;font-weight:bold;min-height:28px"></div>
+</section>
+<section class="panel certificate hidden" id="result">
+ <div class="stars">🏆 ⭐ 🏆</div>
+ <h2>شهادة فوز وتفوق</h2>
+ <p style="font-size:21px">تهنئ المعلمة</p>
+ <h2 id="winner"></h2>
+ <p style="font-size:20px">لاجتيازه مغامرة حرف الياء بنجاح</p>
+ <div class="score" id="finalscore"></div>
+ <p style="font-size:18px">أحسنت يا بطل! استمر في التعلم والتميز 🌟</p>
+ <p style="margin-top:24px;font-weight:bold">معلمتك: إيمان عاشور</p>
+ <button class="primary" onclick="sendResult()">إرسال النتيجة للمعلمة عبر واتساب 📱</button>
+ <button onclick="window.print()">طباعة الشهادة 🖨️</button>
+ <p class="small">سيتم فتح واتساب برسالة جاهزة، اضغط إرسال لإيصال النتيجة.</p>
+</section>
+<footer>بالتوفيق يا أبطال الصف الأول الابتدائي 💖</footer>
+</div>
+<script>
+const qs=[
+ {p:"🪁",q:"ما الحركة المناسبة لحرف الياء في كلمة «يَد»؟",a:["الفتحة","الكسرة","الضمة"],c:0},
+ {p:"🐘",q:"أي كلمة تحتوي على مد بالياء؟",a:["فيل","ولد","قلم"],c:0},
+ {p:"🍇",q:"أين يأتي حرف الياء في كلمة «كرسي»؟",a:["في أول الكلمة","في وسط الكلمة","في آخر الكلمة"],c:2},
+ {p:"🧃",q:"اختر الكلمة التي بها ياء ساكنة قبلها حرف مكسور:",a:["عَصِير","قَمَر","كَتَبَ"],c:0},
+ {p:"🏠",q:"ما الحرف الذي يسبق الياء في كلمة «بيت»؟",a:["الباء","التاء","الياء"],c:0},
+ {p:"🌙",q:"أي كلمة تنتهي بحرف الياء؟",a:["باب","كرسي","قمر"],c:1}
+];
+let index=0,points=0,childName="",answered=false;
+function startGame(){
+ childName=document.getElementById('child').value.trim();
+ if(!childName){alert('اكتب اسم الطفل أولًا 😊');return}
+ document.getElementById('start').classList.add('hidden');
+ document.getElementById('game').classList.remove('hidden');
+ showQuestion();
+}
+function showQuestion(){
+ answered=false;
+ const q=qs[index];
+ document.getElementById('counter').textContent=`السؤال ${index+1} من 6`;
+ document.getElementById('score').textContent=`⭐ ${points}`;
+ document.getElementById('bar').style.width=`${index/6*100}%`;
+ document.getElementById('picture').textContent=q.p;
+ document.getElementById('question').textContent=q.q;
+ document.getElementById('feedback').textContent='';
+ document.getElementById('next').disabled=true;
+ document.getElementById('next').textContent=index===5?'عرض النتيجة 🏆':'السؤال التالي ←';
+ const box=document.getElementById('answers');box.innerHTML='';
+ q.a.forEach((a,i)=>{
+  const b=document.createElement('button');b.className='choice';b.textContent=a;
+  b.onclick=()=>choose(i,b);box.appendChild(b);
+ });
+}
+function choose(i,btn){
+ if(answered)return;answered=true;
+ const q=qs[index],buttons=[...document.querySelectorAll('.choice')];
+ buttons.forEach((b,j)=>{b.disabled=true;if(j===q.c)b.classList.add('correct')});
+ if(i===q.c){points++;document.getElementById('feedback').textContent='إجابة صحيحة! أحسنت ⭐';}
+ else{btn.classList.add('wrong');document.getElementById('feedback').textContent='حاول مرة أخرى في السؤال القادم 💗';}
+ document.getElementById('score').textContent=`⭐ ${points}`;
+ document.getElementById('next').disabled=false;
+}
+function nextQuestion(){
+ if(!answered)return;
+ index++;
+ if(index<qs.length)showQuestion();else finish();
+}
+function finish(){
+ document.getElementById('game').classList.add('hidden');
+ document.getElementById('result').classList.remove('hidden');
+ document.getElementById('winner').textContent=childName;
+ document.getElementById('finalscore').textContent=`درجتك: ${points} من 6 ⭐`;
+ document.getElementById('bar').style.width='100%';
+}
+function sendResult(){
+ const msg=`نتيجة لعبة مغامرة حرف الياء%0Aاسم الطفل: ${encodeURIComponent(childName)}%0Aالدرجة: ${points} من 6%0Aمع تحيات المعلمة إيمان عاشور`;
+ window.open(`https://wa.me/201117055092?text=${msg}`,'_blank');
+}
+</script>
+</body>
+</html>
